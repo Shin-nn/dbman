@@ -152,9 +152,14 @@ sub loop {
 
 	do {
 		%action = $obj->get_action();
-		do {
-			%action = $obj->{-core}->handle_action(%action);
-		} until ($action{processed});
+		eval {
+			$SIG{INT}=sub {
+				die "";
+			};
+			do {
+				%action = $obj->{-core}->handle_action(%action);
+			} until ($action{processed});
+		}
 	} until ($action{action} eq 'QUIT');
 }
 

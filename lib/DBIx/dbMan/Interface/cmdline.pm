@@ -15,9 +15,9 @@ sub init {
 
 	$obj->SUPER::init(@_);
 	eval {
-		require Term::ReadLine;
+		require Term::ReadLine::Zoid;
 	};
-	$obj->{readline} = new Term::ReadLine 'dbMan' unless $@;
+	$obj->{readline} = new Term::ReadLine::Zoid 'dbMan' unless $@;
 	
 	if ($obj->{readline}) {
 		for ($obj->{history}->load()) {
