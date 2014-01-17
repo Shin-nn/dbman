@@ -72,13 +72,29 @@ sub open {
 	return -4 if $obj->{connections}->{$name}->{-logged};
 	return -1 unless grep { $_ eq $obj->{connections}->{$name}->{driver} } $obj->driverlist;
 
+	my @params;
+	if($obj->{connections}->{$name}->{driver} eq "mysql")
+	{
+		push @params,'mysql_enable_utf8',1;
+	}
+
 	my $dbi = DBI->connect('dbi:'.$obj->{connections}->{$name}->{driver}.
 		':'.$obj->{connections}->{$name}->{dsn},
 		$obj->{connections}->{$name}->{login},
 		$obj->{connections}->{$name}->{password},
-		{ PrintError => 0, RaiseError => 0, AutoCommit => 1, LongTruncOk => 1 });
+		{ PrintError => 0, RaiseError => 0, AutoCommit => 1, LongTruncOk => 1,@params });
 
 	return -2 unless defined $dbi;
+
+	if($obj->{connections}->{$name}->{driver} eq "mysql")
+	{
+		my $database_encoding= $dbi->selectall_arrayref("SHOW VARIABLES where variable_name = 'character_set_client'",{Columns=>{}})->[0]->{Value};
+		if($database_encoding && $database_encoding =~ /utf8/i)
+		{
+			binmode STDOUT, ':utf8';
+			binmode STDERR, ':utf8';
+		}
+	}
 
 	$obj->{connections}->{$name}->{-dbi} = $dbi;
 	$obj->{connections}->{$name}->{-mempool} = new DBIx::dbMan::MemPool;

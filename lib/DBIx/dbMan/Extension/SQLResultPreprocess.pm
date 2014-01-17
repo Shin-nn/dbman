@@ -18,7 +18,7 @@ sub handle_action {
 
 	$action{processed} = 1;
 	if ($action{action} eq 'SQL_RESULT' and not $action{sql_result_preprocess} and ref $action{result} eq 'ARRAY') {
-		@$_ = map { (defined) ? join '',(map { ($_ >= 32 && $_ <= 254 && $_ != 127)?chr:sprintf "<%02x>",$_; } unpack "C*",$_) : undef } @$_ for @{$action{result}};
+#		@$_ = map { (defined) ? join '',(map { ($_ >= 32 && $_ <= 254 && $_ != 127)?chr:sprintf "<%02x>",$_; } unpack "C*",$_) : undef } @$_ for @{$action{result}};
 
 		$action{sql_result_preprocess} = 1;
 		delete $action{processed};
